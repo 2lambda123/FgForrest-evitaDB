@@ -27,13 +27,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.evitadb.exception.EvitaInvalidUsageException;
 import io.evitadb.externalApi.lab.gui.dto.EvitaDBConnection;
-import lombok.Getter;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import lombok.Getter;
 
 /**
  * Configuration of lab GUI.
@@ -42,50 +41,58 @@ import java.util.stream.Collectors;
  */
 public class GuiConfig {
 
-	@Getter private final boolean enabled;
-	@Getter private final boolean readOnly;
-	@Getter @Nullable private final List<EvitaDBConnection> preconfiguredConnections;
+  @Getter private final boolean enabled;
+  @Getter private final boolean readOnly;
+  @Getter
+  @Nullable
+  private final List<EvitaDBConnection> preconfiguredConnections;
 
-	public GuiConfig() {
-		this.enabled = true;
-		this.readOnly = false;
-		this.preconfiguredConnections = null;
-	}
+  public GuiConfig() {
+    this.enabled = true;
+    this.readOnly = false;
+    this.preconfiguredConnections = null;
+  }
 
-	public GuiConfig(boolean enabled) {
-		this.enabled = enabled;
-		this.readOnly = false;
-		this.preconfiguredConnections = null;
-	}
+  public GuiConfig(boolean enabled) {
+    this.enabled = enabled;
+    this.readOnly = false;
+    this.preconfiguredConnections = null;
+  }
 
-	@JsonCreator
-	public GuiConfig(@Nullable @JsonProperty("enabled") Boolean enabled,
-	                 @Nullable @JsonProperty("readOnly") Boolean readOnly,
-	                 @Nullable @JsonProperty("preconfiguredConnections") List<EvitaDBConnection> preconfiguredConnections) {
-		this.enabled = Optional.ofNullable(enabled).orElse(true);
-		this.readOnly = Optional.ofNullable(readOnly).orElse(false);
-		validatePreconfiguredConnections(preconfiguredConnections);
-		this.preconfiguredConnections = preconfiguredConnections;
-	}
+  @JsonCreator
+  public GuiConfig(@Nullable @JsonProperty("enabled") Boolean enabled,
+                   @Nullable @JsonProperty("readOnly") Boolean readOnly,
+                   @Nullable @JsonProperty("preconfiguredConnections")
+                   List<EvitaDBConnection> preconfiguredConnections) {
+    this.enabled = Optional.ofNullable(enabled).orElse(true);
+    this.readOnly = Optional.ofNullable(readOnly).orElse(false);
+    validatePreconfiguredConnections(preconfiguredConnections);
+    this.preconfiguredConnections = preconfiguredConnections;
+  }
 
-	private static void validatePreconfiguredConnections(@Nonnull List<EvitaDBConnection> preconfiguredConnections) {
-		preconfiguredConnections.stream()
-			.collect(Collectors.groupingBy(EvitaDBConnection::id, Collectors.counting()))
-			.entrySet()
-			.stream()
-			.filter(it -> it.getValue() > 1)
-			.findFirst()
-			.ifPresent(it -> {
-				throw new EvitaInvalidUsageException("Duplicate evitaDB connection id: " + it.getKey());
-			});
-		preconfiguredConnections.stream()
-			.collect(Collectors.groupingBy(EvitaDBConnection::name, Collectors.counting()))
-			.entrySet()
-			.stream()
-			.filter(it -> it.getValue() > 1)
-			.findFirst()
-			.ifPresent(it -> {
-				throw new EvitaInvalidUsageException("Duplicate evitaDB connection name: " + it.getKey());
-			});
-	}
+  private static void validatePreconfiguredConnections(
+      @Nonnull List<EvitaDBConnection> preconfiguredConnections) {
+    preconfiguredConnections.stream()
+        .collect(
+            Collectors.groupingBy(EvitaDBConnection::id, Collectors.counting()))
+        .entrySet()
+        .stream()
+        .filter(it -> it.getValue() > 1)
+        .findFirst()
+        .ifPresent(it -> {
+          throw new EvitaInvalidUsageException(
+              "Duplicate evitaDB connection id: " + it.getKey());
+        });
+    preconfiguredConnections.stream()
+        .collect(Collectors.groupingBy(EvitaDBConnection::name,
+                                       Collectors.counting()))
+        .entrySet()
+        .stream()
+        .filter(it -> it.getValue() > 1)
+        .findFirst()
+        .ifPresent(it -> {
+          throw new EvitaInvalidUsageException(
+              "Duplicate evitaDB connection name: " + it.getKey());
+        });
+  }
 }
